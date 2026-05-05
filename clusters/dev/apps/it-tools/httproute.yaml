@@ -5,12 +5,14 @@ metadata:
   namespace: default
 spec:
   parentRefs:
-    - name: it-tools-gateway
+    - name: it-tools-gateway   # must match with Gateway name
+  hostnames:
+    - it-tools.mihir.uk       # my domain
   rules:
     - matches:
         - path:
             type: PathPrefix
             value: /
       backendRefs:
-        - name: it-tools
+        - name: it-tools      # my service name
           port: 80
