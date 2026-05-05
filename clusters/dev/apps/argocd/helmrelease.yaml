@@ -1,0 +1,21 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: argocd
+  namespace: argocd
+spec:
+  interval: 10m
+  chart:
+    spec:
+      chart: argo-cd
+      version: 5.x.x
+      sourceRef:
+        kind: HelmRepository
+        name: argocd
+        namespace: flux-system
+  install:
+    createNamespace: true
+  values:
+    server:
+      service:
+        type: ClusterIP8
