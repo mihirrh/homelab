@@ -18,4 +18,4 @@ spec:
   values:
     server:
       service:
-        type: ClusterIP8
+        type: ClusterIP
