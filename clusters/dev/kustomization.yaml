@@ -4,3 +4,4 @@ resources:
   - ./apps/it-tools
   - ./apps/argocd
   - ./infrastructure/envoy-gateway
+  - ./infrastructure/gateway-api

@@ -6,6 +6,4 @@ namespace: default
 resources:
   - deployment.yaml
   - service.yaml
-  - gatewayclass.yaml
-  - gateway.yaml
   - httproute.yaml
