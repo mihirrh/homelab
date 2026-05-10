@@ -11,8 +11,8 @@ spec:
     spec:
       chart: gateway-helm
       version: "1.7.1"
-      sourceRef:
-        kind: HelmRepository
+      chartRef:
+        kind: OCIRepository
         name: envoy-gateway
         namespace: flux-system
   values:
