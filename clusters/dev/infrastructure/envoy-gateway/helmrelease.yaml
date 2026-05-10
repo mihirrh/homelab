@@ -7,14 +7,12 @@ spec:
   interval: 1h
   install:
     createNamespace: true
-  chart:
-    spec:
-      chart: gateway-helm
-      version: "1.7.1"
-      chartRef:
-        kind: OCIRepository
-        name: envoy-gateway
-        namespace: flux-system
+
+  chartRef:
+    kind: OCIRepository
+    name: envoy-gateway
+    namespace: flux-system
+
   values:
     config:
       envoyGateway:
