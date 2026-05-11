@@ -3,10 +3,16 @@ kind: HelmRelease
 metadata:
   name: envoy-gateway
   namespace: envoy-gateway-system
+
 spec:
   interval: 1h
+
   install:
     createNamespace: true
+    crds: Skip
+
+  upgrade:
+    crds: Skip
 
   chartRef:
     kind: OCIRepository
