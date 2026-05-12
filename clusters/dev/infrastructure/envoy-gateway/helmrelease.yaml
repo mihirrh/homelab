@@ -10,9 +10,11 @@ spec:
   install:
     createNamespace: true
     crds: Skip
+    timeout: 10m
 
   upgrade:
     crds: Skip
+    timeout: 10m
 
   chartRef:
     kind: OCIRepository
@@ -20,15 +22,15 @@ spec:
     namespace: flux-system
 
   values:
-  resources:
-    requests:
-      cpu: 10m
-      memory: 64Mi
-    limits:
-      memory: 256Mi
+    resources:
+      requests:
+        cpu: 10m
+        memory: 64Mi
+      limits:
+        memory: 256Mi
 
-  config:
-    envoyGateway:
-      logging:
-        level:
-          default: info
+    config:
+      envoyGateway:
+        logging:
+          level:
+            default: info
