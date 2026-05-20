@@ -3,5 +3,6 @@ kind: Kustomization
 resources:
   - ./apps/it-tools
   - ./apps/argocd
+  - ./apps/reactive-resume
   - ./infrastructure/envoy-gateway
   - ./infrastructure/gateway-api

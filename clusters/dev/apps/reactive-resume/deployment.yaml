@@ -1,0 +1,37 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: reactive-resume
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: reactive-resume
+  template:
+    metadata:
+      labels:
+        app: reactive-resume
+    spec:
+      containers:
+        - name: reactive-resume
+          image: amruthpillai/reactive-resume:latest
+          ports:
+            - containerPort: 3000
+          env:
+            - name: APP_URL
+              value: "http://makemycv.mihir.uk"
+
+            - name: DATABASE_URL
+              value: "postgresql://resume:$(POSTGRES_PASSWORD)@reactive-resume-postgres:5432/resume"
+
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: reactive-resume-secret
+                  key: POSTGRES_PASSWORD
+
+            - name: AUTH_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: reactive-resume-secret
+                  key: AUTH_SECRET
