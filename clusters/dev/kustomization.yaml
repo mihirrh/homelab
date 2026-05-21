@@ -6,3 +6,4 @@ resources:
   - ./apps/reactive-resume
   - ./infrastructure/envoy-gateway
   - ./infrastructure/gateway-api
+  - ./infrastructure/cert-manager
