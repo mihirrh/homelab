@@ -25,6 +25,9 @@ spec:
             - containerPort: 3000
 
           env:
+            - name: TRUST_PROXY
+              value: "true"
+              
             - name: APP_URL
               value: "http://makemycv.mihir.uk"
 
