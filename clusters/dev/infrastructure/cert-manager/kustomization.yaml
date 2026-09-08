@@ -5,4 +5,7 @@ resources:
   - namespace.yaml
   - helmrepository.yaml
   - helmrelease.yaml
-  - clusterissuer.yaml
+  # clusterissuer.yaml is intentionally excluded here.
+  # ClusterIssuer requires cert-manager CRDs which are only available after the
+  # HelmRelease above completes. It is applied by the infra-gateway-api Flux
+  # Kustomization which dependsOn infra-cert-manager (wait: true).

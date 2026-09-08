@@ -1,9 +1,12 @@
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources:
-  - ./apps/it-tools
-  - ./apps/argocd
-  - ./apps/reactive-resume
-  - ./infrastructure/envoy-gateway
-  - ./infrastructure/gateway-api
-  - ./infrastructure/cert-manager
+  # Flux Kustomization CRs — each one manages a component and enforces ordering via dependsOn.
+  # The kustomize-controller applies these CRs; the flux reconciliation loop then reconciles
+  # each component independently in the declared dependency order.
+  - ./infrastructure/envoy-gateway/flux-kustomization.yaml
+  - ./infrastructure/cert-manager/flux-kustomization.yaml
+  - ./infrastructure/gateway-api/flux-kustomization.yaml
+  - ./apps/it-tools/flux-kustomization.yaml
+  - ./apps/reactive-resume/flux-kustomization.yaml
+  - ./apps/argocd/flux-kustomization.yaml

@@ -9,11 +9,11 @@ spec:
 
   install:
     createNamespace: true
-    crds: Skip
+    crds: CreateReplace
     timeout: 10m
 
   upgrade:
-    crds: Skip
+    crds: CreateReplace
     timeout: 10m
 
   chartRef:
