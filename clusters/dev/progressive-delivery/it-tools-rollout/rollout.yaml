@@ -17,8 +17,6 @@ spec:
     spec:
       containers:
         - name: it-tools
-          # Stable tag. For DEMO 3 (successful canary): change to 2024.10.22-7ca5933
-          # For DEMO 4 (failed canary): change to a deliberately bad tag e.g. bad-v999
           image: corentinth/it-tools:2024.5.13-a0bc346
           ports:
             - containerPort: 80
