@@ -12,6 +12,7 @@ spec:
     kind: ClusterIssuer
 
   dnsNames:
+    - mihir.uk
     - makemycv.mihir.uk
     - it-tools.mihir.uk
     - grafana.mihir.uk
