@@ -26,7 +26,7 @@ spec:
         namespace: flux-system
 
   values:
-    # Single controller replica is sufficient for homelab
+    # Single controller replica; includes Gateway API plugin for HTTPRoute weight management
     controller:
       replicas: 1
       resources:
@@ -35,8 +35,12 @@ spec:
           memory: 64Mi
         limits:
           memory: 128Mi
+      trafficRouterPlugins:
+        trafficRouterPlugins: |-
+          - name: "argoproj-labs/gatewayAPI"
+            location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
 
-    # Install the kubectl plugin / dashboard
+    # Rollouts dashboard UI (ClusterIP — not exposed externally)
     dashboard:
       enabled: true
       resources:
@@ -47,11 +51,3 @@ spec:
           memory: 64Mi
       service:
         type: ClusterIP
-
-    # Enable Gateway API traffic routing plugin
-    # This allows Rollouts to manipulate HTTPRoute weights natively
-    controller:
-      trafficRouterPlugins:
-        trafficRouterPlugins: |-
-          - name: "argoproj-labs/gatewayAPI"
-            location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
