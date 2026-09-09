@@ -25,10 +25,9 @@ spec:
         name: argocd
         namespace: flux-system
 
-  # postRenderers patches the Helm-rendered ConfigMap to inject the plugin as a
-  # valid JSON array. The chart template uses toYaml which produces YAML block
-  # strings; the controller expects JSON — this strategic merge patch replaces
-  # the data section with the correct value before Flux applies the manifest.
+  # postRenderers: strategic merge patch injects the plugin JSON into the ConfigMap.
+  # 'add' is used because the chart installs an empty ConfigMap (no data key).
+  # The controller reads trafficRouterPlugins as a JSON array string.
   postRenderers:
     - kustomize:
         patches:
@@ -36,10 +35,9 @@ spec:
               kind: ConfigMap
               name: argo-rollouts-config
             patch: |
-              - op: replace
-                path: /data
-                value:
-                  trafficRouterPlugins: '[{"name":"argoproj-labs/gatewayAPI","location":"https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"}]'
+              - op: add
+                path: /data/trafficRouterPlugins
+                value: '[{"name":"argoproj-labs/gatewayAPI","location":"https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"}]'
 
   values:
     controller:
