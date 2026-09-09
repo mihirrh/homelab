@@ -25,3 +25,9 @@ spec:
       enabled: true
     extraArgs:
       - --enable-gateway-api
+      # Use public DNS for HTTP-01 self-checks.
+      # The cluster's CoreDNS cannot resolve external hostnames (Rackspace Spot
+      # network restriction), so cert-manager must use an external resolver to
+      # pre-validate that the ACME challenge token is reachable before submitting
+      # to Let's Encrypt.
+      - --acme-http01-solver-nameservers=8.8.8.8:53,1.1.1.1:53
