@@ -26,7 +26,6 @@ spec:
         namespace: flux-system
 
   values:
-    # Single controller replica; includes Gateway API plugin for HTTPRoute weight management
     controller:
       replicas: 1
       resources:
@@ -35,12 +34,11 @@ spec:
           memory: 64Mi
         limits:
           memory: 128Mi
-      trafficRouterPlugins:
-        trafficRouterPlugins: |-
-          - name: "argoproj-labs/gatewayAPI"
-            location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
+      # Gateway API plugin — lets Rollouts patch HTTPRoute backendRef weights natively
+      trafficRouterPlugins: |
+        - name: "argoproj-labs/gatewayAPI"
+          location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
 
-    # Rollouts dashboard UI (ClusterIP — not exposed externally)
     dashboard:
       enabled: true
       resources:

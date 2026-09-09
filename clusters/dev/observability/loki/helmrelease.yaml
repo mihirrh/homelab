@@ -17,7 +17,6 @@ spec:
   chart:
     spec:
       chart: loki
-      # loki-6.x is the current SimpleScalable/SingleBinary chart; pin to stable
       version: "6.30.1"
       sourceRef:
         kind: HelmRepository
@@ -25,10 +24,6 @@ spec:
         namespace: flux-system
 
   values:
-    # ---------------------------------------------------------------
-    # Single-binary mode — one pod runs all Loki components.
-    # Perfect for a homelab; no Kafka, no object storage dependency.
-    # ---------------------------------------------------------------
     deploymentMode: SingleBinary
 
     loki:
@@ -63,21 +58,19 @@ spec:
 
     singleBinary:
       replicas: 1
-
       resources:
         requests:
-          cpu: 50m
+          cpu: 25m
           memory: 128Mi
         limits:
-          memory: 384Mi
-
+          memory: 256Mi
       persistence:
         enabled: true
         size: 10Gi
         accessModes:
           - ReadWriteOnce
 
-    # Disable components that only make sense in distributed mode
+    # Disable all distributed-mode components
     read:
       replicas: 0
     write:
@@ -85,18 +78,24 @@ spec:
     backend:
       replicas: 0
 
-    # Gateway (nginx) routes /loki/* to the single-binary pod
+    # Disable memcached caches — not needed for single-binary homelab
+    chunksCache:
+      enabled: false
+    resultsCache:
+      enabled: false
+
+    # Lightweight nginx gateway
     gateway:
       enabled: true
       replicas: 1
       resources:
         requests:
-          cpu: 10m
-          memory: 32Mi
+          cpu: 5m
+          memory: 16Mi
         limits:
-          memory: 64Mi
+          memory: 32Mi
 
-    # Disable the bundled Grafana Agent (we use Alloy instead)
+    # Disable all bundled monitoring/test components
     monitoring:
       selfMonitoring:
         enabled: false
