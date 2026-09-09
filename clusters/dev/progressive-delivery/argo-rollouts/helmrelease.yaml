@@ -25,12 +25,23 @@ spec:
         name: argocd
         namespace: flux-system
 
-  values:
-    # Gateway API plugin — top-level list, NOT nested under controller
-    trafficRouterPlugins:
-      - name: "argoproj-labs/gatewayAPI"
-        location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
+  # postRenderers patches the Helm-rendered ConfigMap to inject the plugin as a
+  # valid JSON array. The chart template uses toYaml which produces YAML block
+  # strings; the controller expects JSON — this strategic merge patch replaces
+  # the data section with the correct value before Flux applies the manifest.
+  postRenderers:
+    - kustomize:
+        patches:
+          - target:
+              kind: ConfigMap
+              name: argo-rollouts-config
+            patch: |
+              - op: replace
+                path: /data
+                value:
+                  trafficRouterPlugins: '[{"name":"argoproj-labs/gatewayAPI","location":"https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"}]'
 
+  values:
     controller:
       replicas: 1
       resources:
