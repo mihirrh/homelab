@@ -7,12 +7,18 @@ metadata:
 spec:
   secretName: mihir-uk-tls
 
+  # commonName sets the CN field in the certificate.
+  # Note: Let's Encrypt ignores CN in favour of SANs, but this controls
+  # what cert-manager puts in the X.509 CN field for display purposes.
+  # mihir.uk has no DNS A record yet — add A → 134.213.78.89 at your DNS
+  # provider if you want it covered as a SAN too.
+  commonName: mihir.uk
+
   issuerRef:
     name: letsencrypt-prod
     kind: ClusterIssuer
 
   dnsNames:
-    - mihir.uk
     - makemycv.mihir.uk
     - it-tools.mihir.uk
     - grafana.mihir.uk
