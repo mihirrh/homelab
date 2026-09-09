@@ -96,13 +96,14 @@ spec:
           memory: 32Mi
 
     # Disable all bundled monitoring/test components
+    lokiCanary:
+      enabled: false
+
     monitoring:
       selfMonitoring:
         enabled: false
         grafanaAgent:
           installOperator: false
-      lokiCanary:
-        enabled: false
 
     test:
       enabled: false

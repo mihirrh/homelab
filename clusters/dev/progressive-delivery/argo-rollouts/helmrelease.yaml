@@ -26,6 +26,11 @@ spec:
         namespace: flux-system
 
   values:
+    # Gateway API plugin — top-level list, NOT nested under controller
+    trafficRouterPlugins:
+      - name: "argoproj-labs/gatewayAPI"
+        location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
+
     controller:
       replicas: 1
       resources:
@@ -34,10 +39,6 @@ spec:
           memory: 64Mi
         limits:
           memory: 128Mi
-      # Gateway API plugin — lets Rollouts patch HTTPRoute backendRef weights natively
-      trafficRouterPlugins: |
-        - name: "argoproj-labs/gatewayAPI"
-          location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"
 
     dashboard:
       enabled: true
