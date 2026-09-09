@@ -82,7 +82,7 @@ spec:
 
       persistence:
         enabled: true
-        size: 2Gi
+        size: 5Gi
         accessModes:
           - ReadWriteOnce
 
@@ -150,7 +150,7 @@ spec:
               accessModes: ["ReadWriteOnce"]
               resources:
                 requests:
-                  storage: 1Gi
+                  storage: 5Gi
 
       config:
         global:
