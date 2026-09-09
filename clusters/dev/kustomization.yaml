@@ -4,9 +4,22 @@ resources:
   # Flux Kustomization CRs — each one manages a component and enforces ordering via dependsOn.
   # The kustomize-controller applies these CRs; the flux reconciliation loop then reconciles
   # each component independently in the declared dependency order.
+
+  # --- Infrastructure (ordered via dependsOn) ---
   - ./infrastructure/envoy-gateway/flux-kustomization.yaml
   - ./infrastructure/cert-manager/flux-kustomization.yaml
   - ./infrastructure/gateway-api/flux-kustomization.yaml
+
+  # --- Applications ---
   - ./apps/it-tools/flux-kustomization.yaml
   - ./apps/reactive-resume/flux-kustomization.yaml
   - ./apps/argocd/flux-kustomization.yaml
+
+  # --- Observability ---
+  - ./observability/kube-prometheus-stack/flux-kustomization.yaml
+  - ./observability/loki/flux-kustomization.yaml
+  - ./observability/alloy/flux-kustomization.yaml
+
+  # --- Progressive Delivery ---
+  - ./progressive-delivery/argo-rollouts/flux-kustomization.yaml
+  - ./progressive-delivery/it-tools-rollout/flux-kustomization.yaml

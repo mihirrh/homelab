@@ -1,0 +1,18 @@
+apiVersion: kustomize.toolkit.fluxcd.io/v1
+kind: Kustomization
+metadata:
+  name: progressive-delivery-argo-rollouts
+  namespace: flux-system
+spec:
+  interval: 10m
+  retryInterval: 2m
+  timeout: 15m
+  sourceRef:
+    kind: GitRepository
+    name: flux-system
+  path: ./clusters/dev/progressive-delivery/argo-rollouts
+  prune: true
+  wait: true
+  dependsOn:
+    # Argo Rollouts controller must be up before we create Rollout CRs
+    - name: infra-gateway-api

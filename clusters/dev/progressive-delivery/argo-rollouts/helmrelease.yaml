@@ -1,0 +1,57 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: argo-rollouts
+  namespace: argo-rollouts
+spec:
+  interval: 1h
+
+  install:
+    createNamespace: true
+    crds: CreateReplace
+    timeout: 10m
+
+  upgrade:
+    crds: CreateReplace
+    timeout: 10m
+    cleanupOnFail: true
+
+  chart:
+    spec:
+      chart: argo-rollouts
+      version: "2.40.0"
+      sourceRef:
+        kind: HelmRepository
+        name: argocd
+        namespace: flux-system
+
+  values:
+    # Single controller replica is sufficient for homelab
+    controller:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 10m
+          memory: 64Mi
+        limits:
+          memory: 128Mi
+
+    # Install the kubectl plugin / dashboard
+    dashboard:
+      enabled: true
+      resources:
+        requests:
+          cpu: 5m
+          memory: 32Mi
+        limits:
+          memory: 64Mi
+      service:
+        type: ClusterIP
+
+    # Enable Gateway API traffic routing plugin
+    # This allows Rollouts to manipulate HTTPRoute weights natively
+    controller:
+      trafficRouterPlugins:
+        trafficRouterPlugins: |-
+          - name: "argoproj-labs/gatewayAPI"
+            location: "https://github.com/argoproj-labs/rollouts-plugin-trafficrouter-gatewayapi/releases/download/v0.6.0/gatewayapi-plugin-linux-amd64"

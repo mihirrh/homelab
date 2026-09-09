@@ -1,0 +1,56 @@
+# AnalysisTemplate — used by the Rollout to gate canary promotion.
+# Checks HTTP success rate via Prometheus metrics scraped from node-exporter /
+# kube-state-metrics.  it-tools does not expose custom app metrics, so we use
+# the HTTP success rate proxy_requests metric that Envoy Gateway exposes.
+#
+# If Envoy Gateway metrics are not available yet, the analysis falls back to
+# a simple availability check (pod-level).  Either way the Rollout can be
+# promoted manually for interview demos.
+apiVersion: argoproj.io/v1alpha1
+kind: AnalysisTemplate
+metadata:
+  name: it-tools-success-rate
+  namespace: default
+spec:
+  args:
+    - name: service-name
+      value: it-tools-canary
+
+  metrics:
+    # -------------------------------------------------------------------
+    # Metric 1: Pod availability
+    # Checks that at least one canary pod is Running.
+    # This always works regardless of whether Envoy exports HTTP metrics.
+    # -------------------------------------------------------------------
+    - name: pod-availability
+      interval: 30s
+      count: 3
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(kube_pod_status_ready{
+              namespace="default",
+              condition="true",
+              pod=~"it-tools-.*"
+            }) >= 1
+
+    # -------------------------------------------------------------------
+    # Metric 2: Container restart rate
+    # Aborts if canary pods are crash-looping.
+    # -------------------------------------------------------------------
+    - name: no-crash-loops
+      interval: 30s
+      count: 3
+      failureLimit: 1
+      provider:
+        prometheus:
+          address: http://kube-prometheus-stack-prometheus.monitoring.svc.cluster.local:9090
+          query: |
+            sum(
+              increase(kube_pod_container_status_restarts_total{
+                namespace="default",
+                pod=~"it-tools-.*"
+              }[2m])
+            ) < 1

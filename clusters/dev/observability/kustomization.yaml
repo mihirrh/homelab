@@ -1,7 +1,7 @@
+# This kustomization.yaml is NOT used by Flux directly.
+# Flux reconciles each subdirectory via its own flux-kustomization.yaml
+# referenced from clusters/dev/kustomization.yaml.
+# This file exists only as a local kustomize entry-point for tooling / review.
 apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 resources: []
-  # Planned:
-  # - prometheus/
-  # - grafana/
-  # - loki/

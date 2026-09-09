@@ -1,0 +1,105 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: alloy-config
+  namespace: logging
+data:
+  config.alloy: |
+    // ----------------------------------------------------------------
+    // Grafana Alloy configuration
+    // Collects Kubernetes pod logs and ships them to Loki.
+    // ----------------------------------------------------------------
+
+    // --- Kubernetes pod log discovery ---
+    discovery.kubernetes "pods" {
+      role = "pod"
+    }
+
+    // --- Relabel: keep only useful metadata, drop noisy system pods ---
+    discovery.relabel "pod_logs" {
+      targets = discovery.kubernetes.pods.targets
+
+      // Namespace label
+      rule {
+        source_labels = ["__meta_kubernetes_namespace"]
+        target_label  = "namespace"
+      }
+
+      // Pod name
+      rule {
+        source_labels = ["__meta_kubernetes_pod_name"]
+        target_label  = "pod"
+      }
+
+      // Container name
+      rule {
+        source_labels = ["__meta_kubernetes_pod_container_name"]
+        target_label  = "container"
+      }
+
+      // app label (falls back to pod name prefix)
+      rule {
+        source_labels = ["__meta_kubernetes_pod_label_app"]
+        target_label  = "app"
+      }
+
+      // Node the pod is running on
+      rule {
+        source_labels = ["__meta_kubernetes_pod_node_name"]
+        target_label  = "node"
+      }
+
+      // Drop pods that are not running
+      rule {
+        source_labels = ["__meta_kubernetes_pod_phase"]
+        regex         = "Pending|Succeeded|Failed|Completed"
+        action        = "drop"
+      }
+
+      // Compose the log path on the node filesystem
+      rule {
+        source_labels = [
+          "__meta_kubernetes_pod_uid",
+          "__meta_kubernetes_pod_container_name",
+        ]
+        separator     = "/"
+        target_label  = "__path__"
+        replacement   = "/var/log/pods/*$1/*.log"
+      }
+    }
+
+    // --- Read logs from files on the node ---
+    loki.source.file "pod_logs" {
+      targets    = discovery.relabel.pod_logs.output
+      forward_to = [loki.process.pod_logs.receiver]
+    }
+
+    // --- Process: parse multi-line and JSON container logs ---
+    loki.process "pod_logs" {
+      // Strip the CRI prefix (e.g. "2024-01-15T12:00:00Z stdout F ")
+      stage.cri {}
+
+      // Try to parse JSON logs produced by structured loggers
+      stage.json {
+        expressions = {
+          level  = "level",
+          msg    = "msg",
+        }
+      }
+
+      // Promote log level to a label when present
+      stage.labels {
+        values = {
+          level = "",
+        }
+      }
+
+      forward_to = [loki.write.loki.receiver]
+    }
+
+    // --- Write to Loki gateway ---
+    loki.write "loki" {
+      endpoint {
+        url = "http://loki-gateway.logging.svc.cluster.local/loki/api/v1/push"
+      }
+    }

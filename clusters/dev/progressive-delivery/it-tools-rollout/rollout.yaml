@@ -1,0 +1,69 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Rollout
+metadata:
+  name: it-tools
+  namespace: default
+spec:
+  replicas: 2
+
+  selector:
+    matchLabels:
+      app: it-tools
+
+  template:
+    metadata:
+      labels:
+        app: it-tools
+    spec:
+      containers:
+        - name: it-tools
+          # Pin to a specific digest or tag for demo purposes.
+          # For DEMO 3 (successful canary): change to 2024.11.7
+          # For DEMO 4 (failed canary): change to bad-version tag (see below)
+          image: corentinth/it-tools:2024.10.22-1
+          ports:
+            - containerPort: 80
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              memory: 64Mi
+
+  strategy:
+    canary:
+      # The two Services Argo Rollouts manages
+      stableService: it-tools-stable
+      canaryService: it-tools-canary
+
+      # Gateway API traffic routing
+      trafficRouting:
+        plugins:
+          argoproj-labs/gatewayAPI:
+            httpRoute: it-tools       # name of the HTTPRoute above
+            namespace: default
+
+      # Optional: Prometheus analysis at each step
+      analysis:
+        templates:
+          - templateName: it-tools-success-rate
+        startingStep: 1             # start analysis after the first weight step
+
+      steps:
+        # Step 1 — send 10 % to canary, pause 60 s (demo-friendly)
+        - setWeight: 10
+        - pause:
+            duration: 60s
+
+        # Step 2 — 25 %
+        - setWeight: 25
+        - pause:
+            duration: 60s
+
+        # Step 3 — 50 %
+        - setWeight: 50
+        - pause:
+            duration: 60s
+
+        # Step 4 — 100 % (Rollout declares stable, old RS scaled down)
+        - setWeight: 100

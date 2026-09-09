@@ -4,6 +4,12 @@ kind: Kustomization
 namespace: default
 
 resources:
-  - deployment.yaml
-  - service.yaml
-  - httproute.yaml
+  # deployment.yaml and service.yaml are intentionally excluded here.
+  # The it-tools workload is now managed as an Argo Rollout in:
+  #   progressive-delivery/it-tools-rollout/
+  # which owns the Rollout, stable/canary Services, and HTTPRoute.
+  #
+  # Keeping this kustomization in place (with no resources) so the Flux
+  # Kustomization apps-it-tools continues to reconcile cleanly.
+  # If you want to remove it entirely, also remove the entry from
+  # clusters/dev/kustomization.yaml.
